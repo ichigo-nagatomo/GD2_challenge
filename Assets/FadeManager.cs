@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class FadeManager : MonoBehaviour {
-    float Speed = 0.001f;        //フェードするスピード
+    float Speed = 0.2f;        //フェードするスピード
     public float red, green, blue, alfa;
 
     public bool Out = false;
@@ -32,7 +32,7 @@ public class FadeManager : MonoBehaviour {
     }
 
     void FadeIn() {
-        alfa -= Speed;
+        alfa -= Speed * Time.deltaTime;
         Alpha();
         if (alfa <= 0) {
             In = false;
@@ -42,7 +42,7 @@ public class FadeManager : MonoBehaviour {
 
     void FadeOut() {
         fadeImage.enabled = true;
-        alfa += Speed;
+        alfa += Speed * Time.deltaTime;
         Alpha();
         if (alfa >= 1) {
             Out = false;
