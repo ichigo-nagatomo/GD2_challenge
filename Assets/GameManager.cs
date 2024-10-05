@@ -62,6 +62,8 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Screen.SetResolution(1280, 720, false);
+
         dropTime = 0f;
         dropTimeInterval = 1f;
         dropPoint[0] = new Vector2(-9, 5);
