@@ -177,6 +177,7 @@ MonoBehaviour:
   fadeManager: {fileID: 1850518683}
   result: {fileID: 1221792002}
   resultScore: {fileID: 1053979701}
+  camaraShake: {fileID: 519420033}
   dropPoints:
   - {fileID: 1463677872}
   - {fileID: 1745334458}
