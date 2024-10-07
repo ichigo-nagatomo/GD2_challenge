@@ -45,6 +45,7 @@ public class Meteor : MonoBehaviour{
         move = speed;
         gameManager = game;
     }
+
     private void OnTriggerEnter2D(Collider2D collision) {
         if (collision.gameObject.tag == "explosion") {
             if (gameManager != null){ // gameManager‚ª³‚µ‚­æ“¾‚Å‚«‚Ä‚¢‚é‚©Šm”F

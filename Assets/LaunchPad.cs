@@ -69,9 +69,11 @@ public class LaunchPad : MonoBehaviour {
         isShoot = shoot;
     }
 
-    public void SetPoint(Vector3 point, GameManager game) {
+    public void SetGameManager(GameManager game) {
+    gameManager = game;}
+
+    public void SetPoint(Vector3 point) {
         aimPoint = point;
-        gameManager = game;
     }
     public void ResetLaunchPad() {
         canShoot = false;

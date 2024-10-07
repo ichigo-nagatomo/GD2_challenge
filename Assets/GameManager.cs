@@ -32,7 +32,7 @@ public class GameManager : MonoBehaviour {
     [SerializeField] private Text result;
     [SerializeField] private Text resultScore;
 
-    private CamaraShake camaraShake;
+    [SerializeField] private CamaraShake camaraShake;
     [SerializeField] private List<GameObject> dropPoints = new List<GameObject>();
     [SerializeField] private GameObject ground;
 
@@ -50,8 +50,6 @@ public class GameManager : MonoBehaviour {
         score = 0;
         time = 0f;
         displayTime = 0f;
-
-        camaraShake = FindObjectOfType<CamaraShake>();
     }
 
     // Update is called once per frame
@@ -59,6 +57,9 @@ public class GameManager : MonoBehaviour {
         mousePos = Input.mousePosition;
         reticlePos = Camera.main.ScreenToWorldPoint(mousePos);
 
+        foreach (var launchPad in launchPads) {
+            launchPad.SetGameManager(this);
+        }
         if (Input.GetMouseButtonDown(0)) {
             Shoot();
         }
@@ -66,7 +67,9 @@ public class GameManager : MonoBehaviour {
         dropTime += Time.deltaTime;
 
         if (dropTime >= dropTimeInterval) {
-            DropMeteor();
+            if (displayTime <= 5f) {
+                DropMeteor();
+            }
             dropTime = 0f;
         }
 
@@ -78,12 +81,6 @@ public class GameManager : MonoBehaviour {
             fadeManager.Out = true;
             time += Time.deltaTime;
             displayTime += Time.deltaTime;
-            if (time >= 0.2f) {
-                float x = Random.Range(-8, 8);
-                float y = Random.Range(-5, 5);
-                Explosion explosion = Instantiate(explosionPrefab, new Vector3(x, y, -1), Quaternion.identity);
-                time = 0f;
-            }
 
             if (displayTime >= 5f) {
                 result.enabled = true;
@@ -95,6 +92,13 @@ public class GameManager : MonoBehaviour {
                 }
             } else {
                 camaraShake.StartShake(5f, 0.1f, 0.5f);
+
+                if (time >= 0.2f) {
+                    float x = Random.Range(-8, 8);
+                    float y = Random.Range(-5, 5);
+                    Explosion explosion = Instantiate(explosionPrefab, new Vector3(x, y, -1), Quaternion.identity);
+                    time = 0f;
+                }
             }
         }
     }
@@ -104,7 +108,7 @@ public class GameManager : MonoBehaviour {
             if (launchPad != null && launchPad.IsReadyToShoot()) {
                 Reticle reticle = Instantiate(reticlePrefab, new Vector3(reticlePos.x, reticlePos.y, -0.1f), Quaternion.identity);
                 launchPad.SetShoot(true);
-                launchPad.SetPoint(reticlePos, this);
+                launchPad.SetPoint(reticlePos);
                 break;
             }
         }
