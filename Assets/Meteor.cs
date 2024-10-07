@@ -16,13 +16,16 @@ public class Meteor : MonoBehaviour{
     [SerializeField] public Particle particlePrefab;
 
     private GameManager gameManager;
+    private CamaraShake camaraShake;
+
 
     // Start is called before the first frame update
     void Start() {
         destroyTime = 0f;
         radius = 0.7f;
         particleTime = 0f;
-        gameManager = FindObjectOfType<GameManager>(); // 自動的にGameManagerを探して取得
+        gameManager = FindObjectOfType<GameManager>();
+        camaraShake = FindObjectOfType<CamaraShake>();// 自動的にGameManagerを探して取得
     }
 
     // Update is called once per frame
@@ -48,11 +51,17 @@ public class Meteor : MonoBehaviour{
     private void OnTriggerEnter2D(Collider2D collision) {
         if (collision.gameObject.tag == "explosion") {
             if (gameManager != null){ // gameManagerが正しく取得できているか確認
-                gameManager.StartShake(0.1f, 0.05f, 0.5f);
+                camaraShake.StartShake(0.1f, 0.05f, 0.5f);
                 gameManager.AddScore();
             }
             Destroy(gameObject);
             Explosion explosion = Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+        }
+
+        if (collision.gameObject.tag == "ground") {
+            camaraShake.StartShake(0.5f, 0.05f, 0.5f);
+            gameManager.SubtractLife();
+            Destroy(gameObject);
         }
     }
 }

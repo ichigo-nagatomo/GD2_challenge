@@ -3,21 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class LaunchPad : MonoBehaviour {
-    [SerializeField] public float coolTime;
+    private bool isShoot;
+    private float coolTime;
     private float interval;
-    [SerializeField] public bool canShoot;
+    private bool canShoot;
     private int life;
+    private Vector2 aimPoint;
+
+    [SerializeField] private Bullet bulletPrefab;
     [SerializeField] public ExplosionLaunch explosionLaunchPrefab;
+    private CamaraShake camaraShake;
+
     private SpriteRenderer spriteRenderer;
     private Color startColor;
     private Color coolDownColor;
 
     // Start is called before the first frame update
     void Start() {
+        isShoot = false;
         coolTime = 0;
         interval = 3f;
         canShoot = true;
         life = 3;
+        camaraShake = FindObjectOfType<CamaraShake>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         startColor = spriteRenderer.color; // 元の色を保存
         coolDownColor = Color.red; // クールタイム中の色
@@ -25,7 +33,14 @@ public class LaunchPad : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        if (!canShoot) {
+        if (canShoot) {
+            if (isShoot) {
+                Bullet bullet = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+                bullet.SetVector(aimPoint, transform.position);
+                isShoot = false;
+                ResetLaunchPad();
+            }
+        }else {
             if (coolTime <= interval) {
                 coolTime += Time.deltaTime;
                 // 色をクールタイムに応じて補間する
@@ -41,6 +56,7 @@ public class LaunchPad : MonoBehaviour {
 
         if (life <= 0) {
             ExplosionLaunch explosionLaunch = Instantiate(explosionLaunchPrefab, new Vector3(transform.position.x, 0.5f, 0.1f), Quaternion.identity);
+            camaraShake.StartShake(3f, 0.1f, 0.5f);
             Destroy(gameObject);
         }
     }
@@ -49,6 +65,13 @@ public class LaunchPad : MonoBehaviour {
         return canShoot;
     }
 
+    public void SetShoot(bool shoot) {
+        isShoot = shoot;
+    }
+
+    public void SetPoint(Vector3 point) {
+        aimPoint = point;
+    }
     public void ResetLaunchPad() {
         canShoot = false;
         coolTime = 0f;

@@ -46,7 +46,7 @@ public class Bullet : MonoBehaviour {
     }
 
     // 移動方向と爆発位置を設定するメソッド
-    public void GetVector(Vector3 from, Vector3 to) {
+    public void SetVector(Vector3 from, Vector3 to) {
         dir = new Vector3(from.x - to.x, from.y - to.y, 0).normalized;
         explosionPos = new Vector3(from.x, from.y, 0);
     }
