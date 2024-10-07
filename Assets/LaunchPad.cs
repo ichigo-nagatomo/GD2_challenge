@@ -12,7 +12,7 @@ public class LaunchPad : MonoBehaviour {
 
     [SerializeField] private Bullet bulletPrefab;
     [SerializeField] public ExplosionLaunch explosionLaunchPrefab;
-    private CamaraShake camaraShake;
+    private GameManager gameManager;
 
     private SpriteRenderer spriteRenderer;
     private Color startColor;
@@ -25,7 +25,7 @@ public class LaunchPad : MonoBehaviour {
         interval = 3f;
         canShoot = true;
         life = 3;
-        camaraShake = FindObjectOfType<CamaraShake>();
+
         spriteRenderer = GetComponent<SpriteRenderer>();
         startColor = spriteRenderer.color; // 元の色を保存
         coolDownColor = Color.red; // クールタイム中の色
@@ -56,7 +56,7 @@ public class LaunchPad : MonoBehaviour {
 
         if (life <= 0) {
             ExplosionLaunch explosionLaunch = Instantiate(explosionLaunchPrefab, new Vector3(transform.position.x, 0.5f, 0.1f), Quaternion.identity);
-            camaraShake.StartShake(3f, 0.1f, 0.5f);
+            gameManager.Shake(3f, 0.1f, 0.5f);
             Destroy(gameObject);
         }
     }
@@ -69,8 +69,9 @@ public class LaunchPad : MonoBehaviour {
         isShoot = shoot;
     }
 
-    public void SetPoint(Vector3 point) {
+    public void SetPoint(Vector3 point, GameManager game) {
         aimPoint = point;
+        gameManager = game;
     }
     public void ResetLaunchPad() {
         canShoot = false;

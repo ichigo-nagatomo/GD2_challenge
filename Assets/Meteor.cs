@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Meteor : MonoBehaviour{
@@ -14,18 +15,13 @@ public class Meteor : MonoBehaviour{
 
     [SerializeField] public Explosion explosionPrefab;
     [SerializeField] public Particle particlePrefab;
-
     private GameManager gameManager;
-    private CamaraShake camaraShake;
-
 
     // Start is called before the first frame update
     void Start() {
         destroyTime = 0f;
         radius = 0.7f;
         particleTime = 0f;
-        gameManager = FindObjectOfType<GameManager>();
-        camaraShake = FindObjectOfType<CamaraShake>();// ©“®“I‚ÉGameManager‚ğ’T‚µ‚Äæ“¾
     }
 
     // Update is called once per frame
@@ -44,14 +40,15 @@ public class Meteor : MonoBehaviour{
             particleTime = 0f;
         }
     }
-    public void GetVector(Vector3 from, Vector3 to, float speed) {
+    public void GetVector(Vector3 from, Vector3 to, float speed, GameManager game) {
         dir = new Vector3(from.x - to.x, from.y - to.y, 0).normalized;
         move = speed;
+        gameManager = game;
     }
     private void OnTriggerEnter2D(Collider2D collision) {
         if (collision.gameObject.tag == "explosion") {
             if (gameManager != null){ // gameManager‚ª³‚µ‚­æ“¾‚Å‚«‚Ä‚¢‚é‚©Šm”F
-                camaraShake.StartShake(0.1f, 0.05f, 0.5f);
+                gameManager.Shake(0.1f, 0.05f, 0.5f);
                 gameManager.AddScore();
             }
             Destroy(gameObject);
@@ -59,7 +56,7 @@ public class Meteor : MonoBehaviour{
         }
 
         if (collision.gameObject.tag == "ground") {
-            camaraShake.StartShake(0.5f, 0.05f, 0.5f);
+            gameManager.Shake(0.5f, 0.05f, 0.5f);
             gameManager.SubtractLife();
             Destroy(gameObject);
         }

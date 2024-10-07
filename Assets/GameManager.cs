@@ -7,8 +7,7 @@ using UnityEngine.Animations;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class GameManager : MonoBehaviour
-{
+public class GameManager : MonoBehaviour {
     private Vector2 mousePos;
     private Vector2 reticlePos;
 
@@ -25,7 +24,7 @@ public class GameManager : MonoBehaviour
     private float displayTime;
 
     [SerializeField] private Reticle reticlePrefab;
-    [SerializeField] private LaunchPad[] launchPad = new LaunchPad[3];
+    [SerializeField] private List<LaunchPad> launchPads = new List<LaunchPad>();
     [SerializeField] private Meteor meteorPrefab;
     [SerializeField] private Explosion explosionPrefab;
     [SerializeField] private FadeManager fadeManager;
@@ -34,12 +33,11 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Text resultScore;
 
     private CamaraShake camaraShake;
-    [SerializeField] private GameObject[] dropPoint = new GameObject[3];
+    [SerializeField] private List<GameObject> dropPoints = new List<GameObject>();
     [SerializeField] private GameObject ground;
 
     // Start is called before the first frame update
-    void Start()
-    {
+    void Start() {
         Screen.SetResolution(1280, 720, false);
 
         dropTime = 0f;
@@ -57,11 +55,10 @@ public class GameManager : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         mousePos = Input.mousePosition;
         reticlePos = Camera.main.ScreenToWorldPoint(mousePos);
-        
+
         if (Input.GetMouseButtonDown(0)) {
             Shoot();
         }
@@ -73,7 +70,7 @@ public class GameManager : MonoBehaviour
             dropTime = 0f;
         }
 
-        if(Input.GetKeyDown(KeyCode.R)) {
+        if (Input.GetKeyDown(KeyCode.R)) {
             SceneManager.LoadScene(0);
         }
 
@@ -103,42 +100,40 @@ public class GameManager : MonoBehaviour
     }
 
     void Shoot() {
-        for (int i = 0; i < launchPad.Length; i++) {
-            if (launchPad[i]) {
-                if (launchPad[i].IsReadyToShoot()) {
-                    Reticle reticle = Instantiate(reticlePrefab, new Vector3(reticlePos.x, reticlePos.y, -0.1f), Quaternion.identity);
-                    launchPad[i].SetShoot(true);
-                    launchPad[i].SetPoint(reticlePos);
-                    break;
-                }
+        foreach (var launchPad in launchPads) {
+            if (launchPad != null && launchPad.IsReadyToShoot()) {
+                Reticle reticle = Instantiate(reticlePrefab, new Vector3(reticlePos.x, reticlePos.y, -0.1f), Quaternion.identity);
+                launchPad.SetShoot(true);
+                launchPad.SetPoint(reticlePos, this);
+                break;
             }
         }
     }
+
     void DropMeteor() {
         targetPoint.x = Random.Range(bounds.min.x, bounds.max.x);
         int randSpeed = Random.Range(2, 5);
 
         bool allLaunchPadsMissing = true;
-        Meteor meteor;
 
-        for (int i = 0; i < 3; i++) {
-            if (launchPad[i]) {
+        foreach (var launchPad in launchPads) {
+            if (launchPad != null) {
                 allLaunchPadsMissing = false;
+                break;
             }
         }
 
-        meteor = Instantiate(meteorPrefab, dropPoint[rand].transform.position, transform.rotation);
+        Meteor meteor = Instantiate(meteorPrefab, dropPoints[rand].transform.position, transform.rotation);
         if (allLaunchPadsMissing) {
             randSpeed = 6;
         }
-        meteor.GetVector(targetPoint, dropPoint[rand].transform.position, randSpeed);
+        meteor.GetVector(targetPoint, dropPoints[rand].transform.position, randSpeed, this);
 
-        // launchPad‚ª‚·‚×‚Ä‘¶Ý‚µ‚È‚¢ê‡AŽŸ‚Ì’e‚ð‘‚­”­ŽË‚·‚é
         if (allLaunchPadsMissing) {
             dropTimeInterval = 0.5f;
         }
 
-        rand = Random.Range(0, 3);
+        rand = Random.Range(0, dropPoints.Count);
     }
 
     public void SubtractLife() {
@@ -157,5 +152,9 @@ public class GameManager : MonoBehaviour
 
     public int GetScore() {
         return score;
+    }
+
+    public void Shake(float duration, float strength, float vibrato) {
+        camaraShake.StartShake(duration, strength, vibrato);
     }
 }
